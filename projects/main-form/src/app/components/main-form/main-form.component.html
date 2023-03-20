@@ -1,0 +1,5 @@
+<form [formGroup]="checkoutForm" (ngSubmit)="register(checkoutForm.value)" class="main-form">
+    <label for="name">Nombre</label>
+    <input type="text" name="name" id="name" placeholder="Aqui va tu nombre" formControlName="name">
+    <button type="submit">Registrarse</button>
+</form>

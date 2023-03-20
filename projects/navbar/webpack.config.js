@@ -5,7 +5,7 @@ module.exports = withModuleFederationPlugin({
   name: 'navbar',
 
   exposes: {
-    './Component': './projects/navbar/src/app/app.component.ts',
+    './showNavbarModule': './projects/navbar/src/app/components/navbar.module.ts',
   },
 
   shared: {
