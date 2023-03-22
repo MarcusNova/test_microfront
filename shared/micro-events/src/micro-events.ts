@@ -1,76 +1,55 @@
-import { v4 as uuid, validate as validateUUID } from "uuid";
-type Topic = string;
-type Message = Record<string, unknown>;
-type ID = string;
-type OnMessageFn = (message: Message) => void;
 
+type OnSubscribe = (payload: any) => void 
+type persistentEvent = { eventName: string, detail: any }
 
 export class MicroEvents {
-    private subscriberOnMsg: Record<ID, OnMessageFn> = {};
-    // Keep track of the topic for each subscription id for easier cleanup.
-    private subscriberTopics: Record<ID, Topic> = {};
-    // Keep track of all topics and subscriber ids for each topic.
-    private topics: Record<Topic, ID[]> = {};
+    private persistentEvents: persistentEvent[] = [];
 
-    public subscribe(topic: Topic, onMessage: OnMessageFn): ID {
-        if (typeof topic !== 'string') throw new Error("Topic must be a string")
-        if (typeof onMessage !== "function")
-            throw new Error("onMessage must be a function.");
-        const subID = uuid();
-        if (!(topic in this.topics)) {
-            // New topic
-            this.topics[topic] = [subID];
-        } else {
-            // Topic exists
-            this.topics[topic].push(subID);
-        }
-        // Store onMessage and topic separately for faster lookup
-        this.subscriberOnMsg[subID] = onMessage;
-        this.subscriberTopics[subID] = topic;
-        // Return the subscription id
-        return subID;
-    }
+    constructor() {}
 
-    public publish(topic: Topic, message: Record<string, unknown>) {
-        if (typeof topic !== "string") throw new Error("Topic must be a string.");
-        if (typeof message !== "object") {
-            throw new Error("Message must be an object.");
-        }
-        // If topic exists post messages
-        if (topic in this.topics) {
-            const subIDs = this.topics[topic];
-            subIDs.forEach((id) => {
-                if (id in this.subscriberOnMsg) {
-                    this.subscriberOnMsg[id](message);
-                }
-            });
-        }
+    public publish(name: string, detail: any) {        
+        if (!name) throw new Error('Event name cannot be empty')
+        if (this.isEmpty(detail)) throw new Error('Detail cannot be empty')
+        this.checkPersistentEvents(name, detail);
+        const customEvent = new CustomEvent(name, { detail });
+        console.log(this.persistentEvents);
+        
+        window.dispatchEvent(customEvent);        
     }
+    public subscribe(name: string, callback: OnSubscribe) {
+        if (!name) throw new Error('Event subscription name cannot be empty')
+        window.addEventListener(name, callback);
+    }
+    public setPersistentEvents(eventList: string[]): void {
+        if (eventList.length == 0) throw new Error('Persistent event list must has at least one event')
+        this.persistentEvents = eventList.map( event => { return { eventName: event, detail: '' } });
+    }
+    public flushPersistentEvents() {
+        if (this.persistentEvents.length == 0) return
+        this.persistentEvents.forEach(event => this.flushPublish(event))
+    }
+    private flushPublish(event: persistentEvent) {
+        const customEvent = new CustomEvent(event.eventName, event.detail);
+        window.dispatchEvent(customEvent);
+    }
+    private isEmpty<T extends Object>(object: T) {
+        return Object.keys(object).length > 0 ? false : true;
+    }
+    private checkPersistentEvents(name: string, detail: any) {
+        const flagEvent = { eventName: name, detail: '' };
+        const eventChecked = this.checkDetail(flagEvent);
+        // if (eventChecked) {
+        //     const index = this.persistentEvents.findIndex(e => e.eventName == name);
+        //     this.persistentEvents[index] = { eventName: this.persistentEvents[index].eventName, detail }
+        // }
+    }
+    private checkDetail(event: persistentEvent) {
 
-    public unsubscribe(id: ID): void {
-        // Validate inputs
-        if (typeof id !== "string" || !validateUUID(id)) {
-            throw new Error("ID must be a valid UUID.");
-        }
-        // If the id exists in our subscriptions then clear it.
-        if (id in this.subscriberOnMsg && id in this.subscriberTopics) {
-            // Delete message listener
-            delete this.subscriberOnMsg[id];
-            // Remove id from the topics tracker
-            const topic = this.subscriberTopics[id];
-            // Cleanup topics
-            if (topic && topic in this.topics) {
-                const idx = this.topics[topic].findIndex((tID) => tID === id);
-                if (idx > -1) {
-                    this.topics[topic].splice(idx, 1);
-                }
-                // If there are no more listeners clean up the topic as well
-                if (this.topics[topic].length === 0) {
-                    delete this.topics[topic];
-                }
-            }
-            // Delete the topic for this id
-            delete this.subscriberTopics[id];
-        }
     }
+    // private checkInclude(event: persistentEvent) {
+    //     const include = this.persistentEvents.some(e => {
+    //         return JSON.stringify(e) == JSON.stringify(event)
+    //     });
+    //     return include;
+    // }
 }

@@ -1,5 +1,6 @@
 import { NgModule } from '@angular/core';
 import { BrowserModule } from '@angular/platform-browser';
+import { MicroEvents } from 'shared/micro-events/src/micro-events';
 
 import { AppRoutingModule } from './app-routing.module';
 import { AppComponent } from './app.component';
@@ -14,7 +15,7 @@ import { ComponentsModule } from './components/components.module';
     AppRoutingModule,
     ComponentsModule
   ],
-  providers: [],
+  providers: [MicroEvents],
   bootstrap: [AppComponent]
 })
 export class AppModule { }
