@@ -11,8 +11,7 @@ import { MicroEventService } from './services/micro-events.service';
 export class AppComponent implements OnInit {
   title = 'main-form';
   constructor(private router: Router, private microEventService: MicroEventService) {
-    this.microEventService.setMicrofrontends(['/navbar']);
-    this.microEventService.setEvents(['userName']);
+    this.microEventService.setUp(['userName'],['/navbar']);
   }
   ngOnInit() {
     this.router.events

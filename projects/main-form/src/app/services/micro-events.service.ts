@@ -15,8 +15,24 @@ interface event {
 export class MicroEventService {
     private listEvents: event[] = [];
     private microfrontendList: string[] = [];
-    
-    public setEvents(listenerList: string[]) {
+
+    public setUp(listEvent: string[], microfrontendList: string[]) {
+        if (listEvent.length == 0) throw new Error("There must be at least one event to listen")
+        if (microfrontendList.length == 0) throw new Error("Threre must be at least one microfrontend")
+        this.setEvents(listEvent);
+        this.setMicrofrontends(microfrontendList);
+    }
+
+    public flushEvents(route: string) {
+        if (this.microfrontendList.includes(route)) {
+            this.listEvents.forEach(event => {
+                const customEvent = new CustomEvent(event.id, event.data);
+                dispatchEvent(customEvent);
+            })
+        }
+    }
+   
+    private setEvents(listenerList: string[]) {
         for (let i= 0; i < listenerList.length; i++) {
             const listenerRegister = fromEvent(window, listenerList[i])
             .pipe(
@@ -28,15 +44,7 @@ export class MicroEventService {
             this.listEvents.push({ listener: listenerRegister, data: null, id: listenerList[i]})
         }
     }
-    public flushEvents(route: string) {
-        if (this.microfrontendList.includes(route)) {
-            this.listEvents.forEach(event => {
-                const customEvent = new CustomEvent(event.id, event.data);
-                dispatchEvent(customEvent);
-            })
-        }
-    }
-    public setMicrofrontends(list: string[]) {
+    private setMicrofrontends(list: string[]) {
         this.microfrontendList = [...list];
     }
     private setData(data: any, index: number) {
