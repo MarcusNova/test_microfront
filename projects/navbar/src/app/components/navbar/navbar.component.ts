@@ -1,35 +1,48 @@
-import { ChangeDetectorRef, Component, OnInit } from '@angular/core';
-import { MicroEvents } from 'shared/micro-events/src/micro-events';
-import { MicroEventService } from '../../services/micro-events.service';
+import { Component, OnDestroy, OnInit } from '@angular/core';
+import { Store } from '@ngrx/store';
+import { fromEvent, map } from 'rxjs';
+import { setName } from '../../store/navbar.actions';
+import { NavbarState } from '../../store/navbar.reducer';
+import { selectName } from '../../store/navbar.selectors';
 
 @Component({
   selector: 'app-navbar',
   templateUrl: './navbar.component.html',
   styleUrls: ['./navbar.component.scss']
 })
-export class NavbarComponent implements OnInit {
+export class NavbarComponent implements OnInit, OnDestroy {
   public userName = '';
-  // private BC = new BroadcastChannel('microchannel');
+  private subscription$: any;
   constructor(
-    private changeDectector: ChangeDetectorRef,
-    private microEventService: MicroEventService
+    private store: Store<NavbarState>,
   ) {
   }
 
   ngOnInit(): void {
-    // this.microEventListener.subscribe("userName", (payload) => {
-
-    //   this.refreshData(payload.detail.message)
-    //   return {
-    //     name: ''
-    //   }
-    // })
-    this.microEventService.on?.subscribe("userName", (payload) => {
-      this.refreshData(payload.detail.message)
-    })
+    this.subscription$ = fromEvent(window, "userName")
+    .pipe(
+      map((e: any) => {
+        this.refreshData(e?.detail)
+      })
+    )
+    .subscribe();
+    this.store.select(selectName)
+      .pipe(
+        map(({ name }) => {
+          if (name) this.userName = name;
+        })
+      )
+      .subscribe()
   }
   refreshData(data: any) {
-    if (data) this.userName = data.name;
-    this.changeDectector.detectChanges();
+    if (data) {
+      this.store.dispatch(setName({ payload: data.name }))
+    }
   }
+  
+  ngOnDestroy(): void {
+    this.subscription$.unsubscribe();
+  }
+
+  
 }

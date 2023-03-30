@@ -1,55 +1,77 @@
-
-type OnSubscribe = (payload: any) => void 
-type persistentEvent = { eventName: string, detail: any }
+interface Event {
+  event: CustomEvent,
+  id: string
+}
+interface microfrontend {
+  name: string,
+  loaded: boolean
+}
 
 export class MicroEvents {
-    private persistentEvents: persistentEvent[] = [];
+  private eventList: Event[] = [];
+  private microfrontendList: microfrontend[] = [];
 
-    constructor() {}
+  public publish(eventName: string, data: any) {
+    if (!this.checkEvents(eventName, data)) {
+      const customEvent = { event: new CustomEvent(eventName, data), id: eventName };
+      this.eventList.push(customEvent);
+      window.dispatchEvent(customEvent.event);
+    } else {
+      this.flush(eventName);
+    }    
+    console.log(this.eventList);
+  }
+  public subscribe(eventName: string, callback: ((payload: any) => void)) {
+    const isListenerAdded = window.dispatchEvent(new CustomEvent(eventName));
+    if (!isListenerAdded) {
+      // Si ya existe, no es necesario agregar el listener de nuevo
+      return;
+    }
+    console.log(this.eventList);
+    
+    window.addEventListener(eventName, callback); 
+  }
+  public setMicrofrontends(list: microfrontend[]) {
+    this.microfrontendList = [...list];
+  }
+  public flushEvents(route: string) {
+    if (this.checkMicrofrontends(route)) { 
+      this.eventList.forEach(eventRegister => {
+        window.dispatchEvent(eventRegister.event); 
+      })
+    }
+  }
+  private checkMicrofrontends(route: string) {
+    let include = false;
+    for (let index = 0; index < this.microfrontendList.length; index++) {
+      if (this.microfrontendList[index].name == route && !this.microfrontendList[index].loaded) {
+        this.microfrontendList[index].loaded = true;
+        include = true;
+        break;
+      }      
+    }
+    return include;
+  }
 
-    public publish(name: string, detail: any) {        
-        if (!name) throw new Error('Event name cannot be empty')
-        if (this.isEmpty(detail)) throw new Error('Detail cannot be empty')
-        this.checkPersistentEvents(name, detail);
-        const customEvent = new CustomEvent(name, { detail });
-        console.log(this.persistentEvents);
-        
-        window.dispatchEvent(customEvent);        
+  private checkEvents(eventName: string, detail: any) {
+    let include = false;
+    for (let index = 0; index < this.eventList.length; index++) {
+      const eventRegister = this.eventList[index];
+      if (eventRegister.id == eventName && eventRegister.event.detail != detail) {
+        this.eventList[index].event = new CustomEvent(eventName, detail);
+        include = true;
+        break;
+      }      
     }
-    public subscribe(name: string, callback: OnSubscribe) {
-        if (!name) throw new Error('Event subscription name cannot be empty')
-        window.addEventListener(name, callback);
-    }
-    public setPersistentEvents(eventList: string[]): void {
-        if (eventList.length == 0) throw new Error('Persistent event list must has at least one event')
-        this.persistentEvents = eventList.map( event => { return { eventName: event, detail: '' } });
-    }
-    public flushPersistentEvents() {
-        if (this.persistentEvents.length == 0) return
-        this.persistentEvents.forEach(event => this.flushPublish(event))
-    }
-    private flushPublish(event: persistentEvent) {
-        const customEvent = new CustomEvent(event.eventName, event.detail);
-        window.dispatchEvent(customEvent);
-    }
-    private isEmpty<T extends Object>(object: T) {
-        return Object.keys(object).length > 0 ? false : true;
-    }
-    private checkPersistentEvents(name: string, detail: any) {
-        const flagEvent = { eventName: name, detail: '' };
-        const eventChecked = this.checkDetail(flagEvent);
-        // if (eventChecked) {
-        //     const index = this.persistentEvents.findIndex(e => e.eventName == name);
-        //     this.persistentEvents[index] = { eventName: this.persistentEvents[index].eventName, detail }
-        // }
-    }
-    private checkDetail(event: persistentEvent) {
+    return include;
+  }
 
-    }
-    // private checkInclude(event: persistentEvent) {
-    //     const include = this.persistentEvents.some(e => {
-    //         return JSON.stringify(e) == JSON.stringify(event)
-    //     });
-    //     return include;
-    // }
+  private flush(eventName: string) {
+    this.eventList.forEach(eventRegister => {
+        if (eventRegister.id == eventName) {
+          window.dispatchEvent(eventRegister.event)
+        }
+    });
+  }
+
 }

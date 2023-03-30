@@ -1,5 +1,6 @@
 import { Component, OnInit } from '@angular/core';
-import { MicroEvents } from 'shared/micro-events/src/micro-events';
+import { NavigationEnd, Router } from '@angular/router';
+import { delay, map, Observable } from 'rxjs';
 import { MicroEventService } from './services/micro-events.service';
 
 @Component({
@@ -9,10 +10,22 @@ import { MicroEventService } from './services/micro-events.service';
 })
 export class AppComponent implements OnInit {
   title = 'main-form';
-  constructor(private microEventService: MicroEventService) {
-    this.microEventService.on?.setPersistentEvents(["userName"]);
+  constructor(private router: Router, private microEventService: MicroEventService) {
+    this.microEventService.setMicrofrontends(['/navbar']);
+    this.microEventService.setEvents(['userName']);
   }
   ngOnInit() {
+    this.router.events
+      .pipe(
+        delay(10),
+        map((val) => this.subscribeEventRouter(val))
+      )
+      .subscribe();
   }
 
+  subscribeEventRouter(routerEvent: any) {
+      if (routerEvent instanceof NavigationEnd) {
+        this.microEventService.flushEvents(routerEvent?.url);
+      }
+  }
 }
