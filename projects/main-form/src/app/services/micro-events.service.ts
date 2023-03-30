@@ -1,7 +1,5 @@
 import { Injectable } from "@angular/core";
 import { fromEvent, map, Observable, Subscription } from "rxjs";
-import { MicroEvents } from "shared/micro-events/src/micro-events";
-import { Broker } from "./broker-service";
 
 interface event {
     listener: Subscription,
