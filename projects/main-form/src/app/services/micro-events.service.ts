@@ -24,8 +24,8 @@ export class MicroEventService {
     public flushEvents(route: string) {
         if (this.microfrontendList.includes(route)) {
             this.listEvents.forEach(event => {
-                const customEvent = new CustomEvent(event.id, event.data);
-                dispatchEvent(customEvent);
+                // const customEvent = new CustomEvent(event.id, event.data);
+                // dispatchEvent(customEvent);
             })
         }
     }
@@ -36,6 +36,8 @@ export class MicroEventService {
             .pipe(
                 map((data: any) => {
                     this.setData(data, i)
+                    console.log(data);
+                    
                 })
             )
             .subscribe()

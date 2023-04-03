@@ -5,11 +5,11 @@ module.exports = withModuleFederationPlugin({
   name: 'navbar',
 
   exposes: {
-    './showNavbarModule': './projects/navbar/src/app/export/entry.module.ts',
+    './navbarComponents': './projects/navbar/src/app/export/entry.module.ts',
+    './navbarBehavior': './projects/navbar/src/app/export/navbar.behavior.ts'
   },
 
   shared: {
     ...shareAll({ singleton: true, strictVersion: true, requiredVersion: 'auto' }),
   },
-
 });

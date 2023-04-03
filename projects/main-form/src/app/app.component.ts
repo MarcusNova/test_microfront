@@ -8,23 +8,8 @@ import { MicroEventService } from './services/micro-events.service';
   templateUrl: './app.component.html',
   styleUrls: ['./app.component.scss']
 })
-export class AppComponent implements OnInit {
+export class AppComponent {
   title = 'main-form';
-  constructor(private router: Router, private microEventService: MicroEventService) {
-    this.microEventService.setUp(['userName'],['/navbar']);
-  }
-  ngOnInit() {
-    this.router.events
-      .pipe(
-        delay(10),
-        map((val) => this.subscribeEventRouter(val))
-      )
-      .subscribe();
-  }
-
-  subscribeEventRouter(routerEvent: any) {
-      if (routerEvent instanceof NavigationEnd) {
-        this.microEventService.flushEvents(routerEvent?.url);
-      }
+  constructor() {
   }
 }

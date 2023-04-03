@@ -1,9 +1,10 @@
 import { Component, OnDestroy, OnInit } from '@angular/core';
 import { Store } from '@ngrx/store';
-import { fromEvent, map } from 'rxjs';
+import { map } from 'rxjs';
 import { setName } from '../../store/navbar.actions';
 import { NavbarState } from '../../store/navbar.reducer';
 import { selectName } from '../../store/navbar.selectors';
+import behavior from '../../export/navbar.behavior';
 
 @Component({
   selector: 'app-navbar',
@@ -19,10 +20,12 @@ export class NavbarComponent implements OnInit, OnDestroy {
   }
 
   ngOnInit(): void {
-    this.subscription$ = fromEvent(window, "userName")
+    this.subscription$ = behavior
     .pipe(
       map((e: any) => {
-        this.refreshData(e?.detail)
+        console.log(e);
+        
+        this.refreshData(e)
       })
     )
     .subscribe();
@@ -36,7 +39,7 @@ export class NavbarComponent implements OnInit, OnDestroy {
   }
   refreshData(data: any) {
     if (data) {
-      this.store.dispatch(setName({ payload: data.name }))
+      this.store.dispatch(setName({ payload: data }))
     }
   }
   

@@ -2,14 +2,15 @@ import { NgModule } from '@angular/core';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { BrowserModule } from '@angular/platform-browser';
 
+import { HttpClientModule } from '@angular/common/http';
+import { EffectsModule } from "@ngrx/effects";
+import { StoreModule } from "@ngrx/store";
+import { StoreDevtoolsModule } from '@ngrx/store-devtools/public_api';
 import { AppRoutingModule } from './app-routing.module';
 import { AppComponent } from './app.component';
 import { ComponentsModule } from './components/components.module';
 import { MicroEventService } from './services/micro-events.service';
-import { StoreModule } from "@ngrx/store";
-import { EffectsModule } from "@ngrx/effects"
-import { StoreDevtoolsModule } from '@ngrx/store-devtools/public_api';
-import { HttpClientModule } from '@angular/common/http';
+import { loadRemoteModule } from '@angular-architects/module-federation';
 
 @NgModule({
   declarations: [
@@ -30,8 +31,11 @@ import { HttpClientModule } from '@angular/common/http';
         persist: true
       }
     }),
+
   ],
-  providers: [MicroEventService],
+  providers: [
+    MicroEventService,
+  ],
   bootstrap: [AppComponent]
 })
 export class AppModule { }
