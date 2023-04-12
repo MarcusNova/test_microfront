@@ -1,6 +1,6 @@
 import { Component, Inject, OnInit } from '@angular/core';
 import { FormBuilder } from '@angular/forms';
-import  behavior from 'navbar/navbarBehavior';
+import { BehaviorService } from '../../behaviors/behavior.service';
 
 @Component({
   selector: 'app-main-form',
@@ -10,7 +10,8 @@ import  behavior from 'navbar/navbarBehavior';
 export class MainFormComponent implements OnInit {
   checkoutForm: any = null;
   constructor(
-    private formBuilder: FormBuilder
+    private formBuilder: FormBuilder,
+    private behaviorService: BehaviorService
   ) {
     this.checkoutForm = this.formBuilder.group({
       name: ''
@@ -23,6 +24,6 @@ export class MainFormComponent implements OnInit {
   register(formValue: any) {
     // const event = new CustomEvent("userName", { detail: formValue });
     // dispatchEvent(event);
-    behavior.next(formValue.name)
+    this.behaviorService.dispatch('name', formValue.name)
   }
 }

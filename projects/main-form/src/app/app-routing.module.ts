@@ -7,6 +7,10 @@ const routes: Routes = [
     loadChildren: () => import('navbar/navbarComponents').then(m => m.EntryModule)
   },
   {
+    path: 'to-do',
+    loadChildren: () => import('toDoList/Module').then(m => m.EntryModule)
+  },
+  {
     path: '',
     component: MainFormComponent
   }

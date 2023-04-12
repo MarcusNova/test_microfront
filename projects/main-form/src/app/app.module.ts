@@ -11,6 +11,7 @@ import { AppComponent } from './app.component';
 import { ComponentsModule } from './components/components.module';
 import { MicroEventService } from './services/micro-events.service';
 import { loadRemoteModule } from '@angular-architects/module-federation';
+import { BehaviorService } from './behaviors/behavior.service';
 
 @NgModule({
   declarations: [
@@ -35,6 +36,7 @@ import { loadRemoteModule } from '@angular-architects/module-federation';
   ],
   providers: [
     MicroEventService,
+    BehaviorService
   ],
   bootstrap: [AppComponent]
 })

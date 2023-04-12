@@ -23,8 +23,6 @@ export class NavbarComponent implements OnInit, OnDestroy {
     this.subscription$ = behavior
     .pipe(
       map((e: any) => {
-        console.log(e);
-        
         this.refreshData(e)
       })
     )

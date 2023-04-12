@@ -1,7 +1,6 @@
-import { Component, OnInit } from '@angular/core';
-import { NavigationEnd, Router } from '@angular/router';
-import { delay, map, Observable } from 'rxjs';
-import { MicroEventService } from './services/micro-events.service';
+import { Component } from '@angular/core';
+import { BehaviorService } from './behaviors/behavior.service';
+import { behaviorList } from './behaviors/constants/behavior-setup.constant';
 
 @Component({
   selector: 'app-root',
@@ -10,6 +9,9 @@ import { MicroEventService } from './services/micro-events.service';
 })
 export class AppComponent {
   title = 'main-form';
-  constructor() {
+  constructor(
+    private behaviorService: BehaviorService
+  ) {
+    this.behaviorService.setBehaviors(behaviorList)
   }
 }

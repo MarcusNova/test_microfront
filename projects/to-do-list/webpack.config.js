@@ -10,7 +10,7 @@ sharedMappings.register(
 
 module.exports = {
   output: {
-    uniqueName: "behaviors",
+    uniqueName: "toDoList",
     publicPath: "auto"
   },
   optimization: {
@@ -29,16 +29,18 @@ module.exports = {
         library: { type: "module" },
 
         // For remotes (please adjust)
-        // name: "behaviors",
-        // filename: "remoteEntry.js",
-        // exposes: {
-        //     './Component': './projects/behaviors/src/app/app.component.ts',
-        // },        
+        name: "toDoList",
+        filename: "remoteEntry.js",
+        exposes: {
+            './Module': './projects/to-do-list/src/app/export/entry.module.ts',
+            './Behavior': './projects/to-do-list/src/app/export/to-do.behavior.ts'
+        },        
         
         // For hosts (please adjust)
         // remotes: {
         //     "navbar": "http://localhost:4500/remoteEntry.js",
         //     "mainForm": "http://localhost:4200/remoteEntry.js",
+        //     "behaviors": "http://localhost:5050/remoteEntry.js",
 
         // },
 
